@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FiveCut – klipp-programmet för FiveM | Gratis för Windows, Linux & mobil</title>
+<meta name="description" content="FiveCut är ett gratis klipp-program för FiveM, GTA RP, Minecraft, Fortnite och alla andra spel. Klipp med en knapp, välj ljud i efterhand, gör TikTok-format och dela med en länk.">
+<meta name="robots" content="index, follow">
+<meta property="og:site_name" content="FiveCut">
+<meta property="og:title" content="FiveCut – klipp-programmet för FiveM">
+<meta property="og:description" content="Klipp med en knapp. Välj ljud i efterhand. Redigera, gör TikTok-format och dela med en länk.">
+<meta property="og:image" content="og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#ff6a13">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"FiveCut","operatingSystem":"Windows, Linux, Android, iOS","applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"SEK"},"description":"Gratis klipp-program för FiveM och alla andra spel."}</script>
+<style>
+  :root { --a: #ff6a13; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #070707; color: #f5f5f5; font: 16px/1.5 'Segoe UI', Inter, system-ui, sans-serif;
+    background-image: radial-gradient(900px 400px at 85% -10%, rgba(255,106,19,.16), transparent 60%), repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0 2px, transparent 2px 9px); }
+  .box { width: min(620px, 100%); padding: 40px; background: #121212; border: 1px solid #262626; text-align: center;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px)); }
+  .brand { display: inline-flex; align-items: center; gap: 14px; font: 800 38px/1 'Segoe UI', sans-serif; letter-spacing: 3px; }
+  .brand span { color: var(--a); }
+  .kick { color: var(--a); font-weight: 700; letter-spacing: .2em; font-size: 12px; text-transform: uppercase; margin: 14px 0 6px; }
+  p { color: #c9c9c9; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 16px 30px; background: var(--a); color: #120700; font-weight: 800; font-size: 18px; text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+  .btn[aria-disabled=true] { background: #333; color: #888; pointer-events: none; }
+  .status { margin-top: 18px; font-size: 14px; color: #9a9a9a; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+  .on .dot { background: #3ddc84; box-shadow: 0 0 12px #3ddc84; }
+  .off .dot { background: #ff3b3b; }
+  .feat { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 28px; text-align: left; }
+  .feat div { background: #181818; border-left: 3px solid var(--a); padding: 10px 12px; font-size: 13.5px; color: #bbb; }
+  .feat b { color: #fff; display: block; }
+</style>
+</head>
+<body>
+<main class="box">
+  <div class="brand"><img src="logo.svg" width="52" height="52" alt=""><b style="font-weight:800">FIVE<span>CUT</span></b></div>
+  <div class="kick">Klipp-programmet för FiveM</div>
+  <p>Klipp dina bästa ögonblick med en knapp, välj ljud i efterhand, redigera och dela med en länk. Gratis för Windows, Linux och mobil.</p>
+  <a class="btn" id="go" href="#" aria-disabled="true">Öppna FiveCut</a>
+  <div class="status" id="st"><span class="dot"></span><span id="stt">Hämtar adress…</span></div>
+  <div class="feat">
+    <div><b>Ett knapptryck</b>Spara de senaste minuterna.</div>
+    <div><b>Bara röster</b>Ta bort skott och musik.</div>
+    <div><b>TikTok-format</b>9:16 med ett klick.</div>
+  </div>
+</main>
+<script>
+// Den här sidan har en fast adress och skickar vidare till FiveCut-servern, vars adress uppdateras automatiskt i link.json.
+(async () => {
+  const host = location.hostname;
+  const owner = host.split('.')[0];
+  const seg = location.pathname.split('/').filter(Boolean)[0];
+  const repo = host.endsWith('.github.io') ? (seg && seg !== 'index.html' ? seg : host) : null;
+  let data = null;
+  try {
+    // GitHub API ger alltid den senaste versionen (Pages kan cacha i några minuter)
+    if (repo) data = await (await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/link.json?t=${Date.now()}`, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-store' })).json();
+  } catch (e) { /* prova reserven */ }
+  if (!data || !data.url) { try { data = await (await fetch('link.json?t=' + Date.now(), { cache: 'no-store' })).json(); } catch (e) { /* */ } }
+  const st = document.getElementById('st'), go = document.getElementById('go'), t = document.getElementById('stt');
+  if (data && data.url && data.online) {
+    const target = data.url + location.hash.replace(/^#!/, '');
+    st.className = 'status on'; t.textContent = 'Online';
+    go.href = target; go.removeAttribute('aria-disabled');
+    if (!new URLSearchParams(location.search).has('stanna')) setTimeout(() => location.replace(target), 1200);
+  } else {
+    st.className = 'status off'; t.textContent = 'FiveCut är offline just nu – försök igen om en stund.';
+  }
+})();
+</script>
+</body>
+</html>
